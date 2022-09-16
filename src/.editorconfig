@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# SCS0012: Controller method is potentially vulnerable to authorization bypass.
+dotnet_diagnostic.SCS0012.severity = error

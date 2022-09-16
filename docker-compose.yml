@@ -1,0 +1,50 @@
+﻿version: "3.6"
+services:
+  rabbitmq:
+    image: masstransit/rabbitmq:latest
+    environment:
+      - RABBITMQ_DEFAULT_USER=desa
+      - RABBITMQ_DEFAULT_PASS=desarrollo
+    ports:
+      - "15672:15672" # Interface web de administracion
+    networks:
+      - network
+  worker:
+    image: unahur/message-bus-fun-worker
+    build:
+      context: ./src
+      dockerfile: ./UNAHUR.MessageFun.Worker/Dockerfile
+    environment:
+      - MessageBusFun__RabbitMQ__Host = rabbitmq://rabbitmq:5672
+      - MessageBusFun__RabbitMQ__Username = desa
+      - MessageBusFun__RabbitMQ__Password = desarrollo
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+    networks:
+      - network
+  service:
+    image: unahur/message-bus-fun-api
+    build:
+      context: ./src
+      dockerfile: ./UNAHUR.MessageFun.Api/Dockerfile
+    environment:
+      - MessageBusFun__RabbitMQ__Host = rabbitmq://rabbitmq:5672
+      - MessageBusFun__RabbitMQ__Username = desa
+      - MessageBusFun__RabbitMQ__Password = desarrollo
+    ports:
+      - "5177:8080"
+      # /swagger para interface web
+      # /metrics para metricas prometheus
+    depends_on:
+      - rabbitmq
+      - worker
+    links:
+      - rabbitmq
+    networks:
+      - network
+networks:
+  # Declare our private network.  We must declare one for the magic
+  # Docker DNS to work, but otherwise its default settings are fine.
+  network: {}
