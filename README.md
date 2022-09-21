@@ -64,8 +64,8 @@ Recibe comando vía REST. Los encola en el bus de mensajes y envía la respuesta
 | API        | 8080   | `/api`          | Apis REST                             |
 | SWAGGER-UI | 8080   | `/swagger`      | Interface HTML de prueba (Swagger-UI) |
 | METRICAS   | 8080   | `/metrics`      | Métricas en formato *Prometheus*      |
-| HEALTH     | 8080   | `/health/live`  | Sonda de servicio VIVO                |
-| READY      | 8080   | `/health/ready` | Sonda de servicio LISTO               |
+| HEALTH     | 8080   | `/healthz/live`  | Sonda de servicio VIVO                |
+| READY      | 8080   | `/healthz/ready` | Sonda de servicio LISTO               |
 
 ### Configuración
 
@@ -97,7 +97,11 @@ Procesa trabajos en segundo plano
 
 ### Endpoints
 
-
+| NOMBRE     | PUERTO | PATH            | DESCRIPCION                           |
+| ---------- | ------ | --------------- | ------------------------------------- |
+| METRICAS   | 9090   | `/metrics`      | Métricas en formato *Prometheus*      |
+| HEALTH     | 9090   | `/healthz/live`  | Sonda de servicio VIVO                |
+| READY      | 9090   | `/healthz/ready` | Sonda de servicio LISTO               |
 
 ### Configuración
 
