@@ -2,6 +2,12 @@
 
 Proyecto de ejemplo para la asignatura Arquitectura de Software II de la Universidad de Hurlingham
 
+
+
+![diagrama](./docs/diagram.svg)
+
+
+
 ## RUN
 
 ```bash
@@ -45,11 +51,7 @@ Broker de mensajes para la comunicación entre servicios
 
 ## Endpoints
 
-
-
 ## Configuración
-
-
 
 ## Contenedor API
 
@@ -59,11 +61,11 @@ Recibe comando vía REST. Los encola en el bus de mensajes y envía la respuesta
 
 ### Endpoints
 
-| NOMBRE     | PUERTO | PATH            | DESCRIPCION                           |
-| ---------- | ------ | --------------- | ------------------------------------- |
-| API        | 8080   | `/api`          | Apis REST                             |
-| SWAGGER-UI | 8080   | `/swagger`      | Interface HTML de prueba (Swagger-UI) |
-| METRICAS   | 8080   | `/metrics`      | Métricas en formato *Prometheus*      |
+| NOMBRE     | PUERTO | PATH             | DESCRIPCION                           |
+| ---------- | ------ | ---------------- | ------------------------------------- |
+| API        | 8080   | `/api`           | Apis REST                             |
+| SWAGGER-UI | 8080   | `/swagger`       | Interface HTML de prueba (Swagger-UI) |
+| METRICAS   | 8080   | `/metrics`       | Métricas en formato *Prometheus*      |
 | HEALTH     | 8080   | `/healthz/live`  | Sonda de servicio VIVO                |
 | READY      | 8080   | `/healthz/ready` | Sonda de servicio LISTO               |
 
@@ -97,11 +99,11 @@ Procesa trabajos en segundo plano
 
 ### Endpoints
 
-| NOMBRE     | PUERTO | PATH            | DESCRIPCION                           |
-| ---------- | ------ | --------------- | ------------------------------------- |
-| METRICAS   | 9090   | `/metrics`      | Métricas en formato *Prometheus*      |
-| HEALTH     | 9090   | `/healthz/live`  | Sonda de servicio VIVO                |
-| READY      | 9090   | `/healthz/ready` | Sonda de servicio LISTO               |
+| NOMBRE   | PUERTO | PATH             | DESCRIPCION                      |
+| -------- | ------ | ---------------- | -------------------------------- |
+| METRICAS | 9090   | `/metrics`       | Métricas en formato *Prometheus* |
+| HEALTH   | 9090   | `/healthz/live`  | Sonda de servicio VIVO           |
+| READY    | 9090   | `/healthz/ready` | Sonda de servicio LISTO          |
 
 ### Configuración
 
