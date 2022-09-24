@@ -25,6 +25,7 @@ namespace UNAHUR.MessageFun.Api.Controllers
             _logger = logger;
             _client = client;
             _greetingClient = greetingClient;
+
         }
 
         /// <summary>

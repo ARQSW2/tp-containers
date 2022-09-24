@@ -1,0 +1,81 @@
+﻿services:
+  rabbitmq:
+    image: masstransit/rabbitmq:latest
+    environment:
+      - RABBITMQ_DEFAULT_USER=desa
+      - RABBITMQ_DEFAULT_PASS=desarrollo
+    ports:
+      - "15672:15672" # Interface web de administracion / metrics
+      - "15692:15692" # METRICS
+      - "5672:5672" # AMQP
+    networks:
+      - network
+    healthcheck:
+        test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+        start_period: 10s
+  worker:
+    image: quay.io/unahur.arqsw/messagefun.worker
+    build:
+      context: ../src
+      dockerfile: ./UNAHUR.MessageFun.Worker/Dockerfile
+    volumes:
+      - ./worker.settings.json:/app/appsettings.json
+    environment:
+      - MessageBusFun__RabbitMQ__Password=desarrollo
+      - MessageBusFun__Metrics__Host=+
+    ports:
+      - "9090:9090"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    links:
+      - rabbitmq
+    networks:
+      - network
+    healthcheck:
+        test: ["CMD", "wget", "--no-verbose","--tries=1","--spider", "http://localhost:9090/healthz/ready"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
+        start_period: 10s
+    mem_limit: 300m
+    mem_reservation: 90m
+    cpus: 2
+  service:
+    image: quay.io/unahur.arqsw/messagefun.api
+    build:
+      context: ../src
+      dockerfile: ./UNAHUR.MessageFun.Api/Dockerfile
+    volumes:
+      - ./api.settings.json:/app/appsettings.json
+    environment:
+      - MessageBusFun__RabbitMQ__Password=desarrollo
+    ports:
+      - "5177:8080"
+      # /swagger para interface web
+      # /metrics para metricas prometheus
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      worker:
+        condition: service_healthy
+    links:
+      - rabbitmq
+    networks:
+      - network
+    healthcheck:
+        test: ["CMD", "wget", "--no-verbose","--tries=1","--spider", "http://localhost:8080/healthz/ready"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
+        start_period: 10s
+    mem_limit: 500m
+    mem_reservation: 90m
+    cpus: 2
+networks:
+  # Declare our private network.  We must declare one for the magic
+  # Docker DNS to work, but otherwise its default settings are fine.
+  network: {}
