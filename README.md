@@ -18,17 +18,22 @@ La solución consta de tres componentes
 
 ```mermaid
 sequenceDiagram
-  actor User
-  User->>+API: POST api/message/payload
-  API->>RabbitMQ: IDoJob + payload
-  API-->>-User:HTTP 200 JobId
-  RabbitMQ->>Worker: DoJobConsumer + payload
-  User->>+API: GET api/message/john
-  API->>RabbitMQ: IGreetingCmd + john
-  RabbitMQ->>Worker: GreetingCmdConsumer + john
-  Worker->>RabbitMQ: GreetingCmdResponse + 'Hola john'
-  RabbitMQ->>API: GreetingCmdResponse + 'Hola john'
-  API->>-User: HTTP 200 Hola john
+  par Proceso Batch
+    actor User
+    User->>+API: POST api/message/payload
+    API->>RabbitMQ: IDoJob + payload
+    API-->>-User:HTTP 200 JobId
+    RabbitMQ->>+Worker: DoJobConsumer + payload
+    Worker->>-RabbitMQ: IJobDone
+  end
+  par CQRS
+    User->>+API: GET api/message/john
+    API->>RabbitMQ: IGreetingCmd + john
+    RabbitMQ->>+Worker: GreetingCmdConsumer + john
+    Worker->>-RabbitMQ: GreetingCmdResponse + 'Hola john'
+    RabbitMQ->>API: GreetingCmdResponse + 'Hola john'
+    API->>-User: HTTP 200 Hola john
+  end
 ```
 
 ## Ejemplo
