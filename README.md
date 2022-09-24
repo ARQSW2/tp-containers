@@ -4,28 +4,73 @@ Proyecto de ejemplo para la asignatura Arquitectura de Software II de la Univers
 
 ![diagrama](./docs/diagram.svg)
 
-## RUN
+## Funcionamiento
+
+La solución consta de tres componentes
+
+- API: recibe comando vía REST. Los encola en el bus de mensajes y envía la respuesta pertinente
+  - `POST api/message/{data}`: Crea un proceso batch `IDoJob` a ser procesado por worker
+  - `GET api/message/{name}`: Envia el comando `IGreetingCmd` para recibir una respuesta desde el worker
+- Worker: Procesa trabajos en segundo plano
+  - `DoJobConsumer`: Procesa el job batch `IDoJob`.
+  - `GreetingCmdConsumer`: Procesa el job batch `IGreetingCmd`.
+- RabbitMQ: bus de mensajes AMQP que conecta **API** y **Worker**
+
+```mermaid
+sequenceDiagram
+  actor User
+  User->>+API: POST api/message/payload
+  API->>RabbitMQ: IDoJob + payload
+  API-->>-User:HTTP 200 JobId
+  RabbitMQ->>Worker: DoJobConsumer + payload
+  User->>+API: GET api/message/john
+  API->>RabbitMQ: IGreetingCmd + john
+  RabbitMQ->>Worker: GreetingCmdConsumer + john
+  Worker->>RabbitMQ: GreetingCmdResponse + 'Hola john'
+  RabbitMQ->>API: GreetingCmdResponse + 'Hola john'
+  API->>-User: HTTP 200 Hola john
+```
+
+## Ejemplo
+
+En la carpeta `./example` hay un ejemplo de implementacion utilizando `docker-compose`
 
 ```bash
+cd example
 # DOCKER
-docker compose up -d
+docker-compose up -d
 # NERDCTL
 nerdctl compose up -d
 ```
 
+**Limpieza**
+
+```bash
+# DOCKER
+docker-compose stop
+docker-compose rm
+# NERDCTL
+nerdctl compose stop
+nerdctl compose rm
+```
+
 ## DEBUG
+
+Para hacer un debug puede utilizar la instancia de RabbitMQ del docker compose ó crear una instancia dedicada (como usan los mismos puerts debe elegir una de las dos opciones NO ambas)
 
 **Herramientas**
 
 - [Visual Studio 2022 Community](https://visualstudio.microsoft.com/es/vs/community/)
 - Rancher Desktop
-- Instancia de Rabbit (con el siguiente comando)
+- Instancia de Rabbit
+
+Para crear una instancia de RabbitMQ inedependiente puede utilizar el siguiente comando
 
 ```bash
 # DOCKER
-docker run -d --hostname myrabbit --name rabbitmq -p 8080:15672 -p 5672:5672 -e RABBITMQ_DEFAULT_USER=desa -e RABBITMQ_DEFAULT_PASS=desarrollo masstransit/rabbitmq:latest
+docker run -d --hostname myrabbit --name rabbitmq -p 15672:15672 -p 5672:5672 -e RABBITMQ_DEFAULT_USER=desa -e RABBITMQ_DEFAULT_PASS=desarrollo masstransit/rabbitmq:latest
 # NERDCRL
-nerdctl run -d --hostname myrabbit --name rabbitmq -p 8080:15672 -p 5672:5672 -e RABBITMQ_DEFAULT_USER=desa -e RABBITMQ_DEFAULT_PASS=desarrollo masstransit/rabbitmq:latest
+nerdctl run -d --hostname myrabbit --name rabbitmq -p 15672:15672 -p 5672:5672 -e RABBITMQ_DEFAULT_USER=desa -e RABBITMQ_DEFAULT_PASS=desarrollo masstransit/rabbitmq:latest
 ```
 
 **Limpieza**
@@ -37,7 +82,7 @@ docker stop myrabbit
 docker rm myrabbit
 
 # NERDCTL
-
+nerdctl stop myrabbit
 nerdctl rm myrabbit
 ```
 
@@ -55,7 +100,7 @@ Broker de mensajes para la comunicación entre servicios. La imagen es una custo
 
 ### Configuración
 
-Settings basicos utilizados por esta implementación 
+Settings basicos utilizados por esta implementación
 
 | ENV                     | DESCRIPCION                     |
 | ----------------------- | ------------------------------- |
@@ -68,7 +113,7 @@ Recibe comando vía REST. Los encola en el bus de mensajes y envía la respuesta
 
 [![Docker Repository on Quay](https://quay.io/repository/unahur.arqsw/messagefun.api/status "Docker Repository on Quay")](https://quay.io/repository/unahur.arqsw/messagefun.api)
 
-### Endpoints
+### Endpoints API
 
 | NOMBRE     | PUERTO | PATH             | DESCRIPCION                           |
 | ---------- | ------ | ---------------- | ------------------------------------- |
@@ -78,7 +123,7 @@ Recibe comando vía REST. Los encola en el bus de mensajes y envía la respuesta
 | HEALTH     | 8080   | `/healthz/live`  | Sonda de servicio VIVO                |
 | READY      | 8080   | `/healthz/ready` | Sonda de servicio LISTO               |
 
-### Configuración
+### Configuración API
 
 El sistema puede configurarse mediante un archivo `app\appsettings.json`) o variables de entorno
 
@@ -106,7 +151,7 @@ Procesa trabajos en segundo plano
 
 [![Docker Repository on Quay](https://quay.io/repository/unahur.arqsw/messagefun.worker/status "Docker Repository on Quay")](https://quay.io/repository/unahur.arqsw/messagefun.worker)
 
-### Endpoints
+### Endpoints Worker
 
 | NOMBRE   | PUERTO | PATH             | DESCRIPCION                      |
 | -------- | ------ | ---------------- | -------------------------------- |
@@ -114,6 +159,6 @@ Procesa trabajos en segundo plano
 | HEALTH   | 9090   | `/healthz/live`  | Sonda de servicio VIVO           |
 | READY    | 9090   | `/healthz/ready` | Sonda de servicio LISTO          |
 
-### Configuración
+### Configuración Worker
 
 IDEM API
