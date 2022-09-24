@@ -2,11 +2,7 @@
 
 Proyecto de ejemplo para la asignatura Arquitectura de Software II de la Universidad de Hurlingham
 
-
-
 ![diagrama](./docs/diagram.svg)
-
-
 
 ## RUN
 
@@ -47,11 +43,24 @@ nerdctl rm myrabbit
 
 ## Contenedor RabbitMQ
 
-Broker de mensajes para la comunicación entre servicios
+Broker de mensajes para la comunicación entre servicios. La imagen es una customización de la imagen oficial de [RabbitMQ en Docker Hub](https://hub.docker.com/_/rabbitmq/)
 
 ## Endpoints
 
-## Configuración
+| NOMBRE        | PUERTO | PATH       | DESCRIPCION                      |
+| ------------- | ------ | ---------- | -------------------------------- |
+| AMQP          | 5672   |            | Puerto TPC para bus de mensajes  |
+| MANAGEMENT-UI | 15672  | `/`        | Interface HTML de administración |
+| METRICAS      | 15692  | `/metrics` | Métricas en formato *Prometheus* |
+
+### Configuración
+
+Settings basicos utilizados por esta implementación 
+
+| ENV                     | DESCRIPCION                     |
+| ----------------------- | ------------------------------- |
+| `RABBITMQ_DEFAULT_USER` | Usuario default                 |
+| `RABBITMQ_DEFAULT_PASS` | Password del usuario de default |
 
 ## Contenedor API
 
