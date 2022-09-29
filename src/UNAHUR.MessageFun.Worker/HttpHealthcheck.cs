@@ -38,6 +38,9 @@ namespace UNAHUR.MessageFun.Worker
 
             var healthBase = _configuration.Metrics.HealthPrefix;
 
+            if (!healthBase.EndsWith("/"))
+                healthBase += "/";
+
             _logger.LogInformation($"Healthcheck init on {healthBase}");
 
             _httpListener.Prefixes.Add(healthBase + "live/");
