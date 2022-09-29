@@ -132,8 +132,8 @@ La imagen esta disponible en https://quay.io/repository/unahur.arqsw/messagefun.
 | NOMBRE   | PUERTO | PATH             | DESCRIPCION                      |
 | -------- | ------ | ---------------- | -------------------------------- |
 | METRICAS | 9090   | `/metrics`       | Métricas en formato *Prometheus* |
-| HEALTH   | 9090   | `/healthz/live`  | Sonda de servicio VIVO           |
-| READY    | 9090   | `/healthz/ready` | Sonda de servicio LISTO          |
+| HEALTH   | 9091   | `/healthz/live`  | Sonda de servicio VIVO           |
+| READY    | 9091   | `/healthz/ready` | Sonda de servicio LISTO          |
 
 ### Configuración Worker
 
