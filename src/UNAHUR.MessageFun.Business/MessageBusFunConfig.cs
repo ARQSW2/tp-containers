@@ -54,11 +54,11 @@
 
     public class MetricsConfig
     {
-        public string Host { get; set; }
+        public string HealthPrefix { get; set; }
         public int Port { get; set; }
         public MetricsConfig()
         {
-            Host = "localhost";
+            HealthPrefix = "http://localhost:9091/healthz/";
             this.Port = 0;
         }
 

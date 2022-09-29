@@ -36,7 +36,7 @@ namespace UNAHUR.MessageFun.Worker
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
 
-            var healthBase = $"http://{_configuration.Metrics.Host}:{_configuration.Metrics.Port}/healthz/";
+            var healthBase = _configuration.Metrics.HealthPrefix;
 
             _logger.LogInformation($"Healthcheck init on {healthBase}");
 
