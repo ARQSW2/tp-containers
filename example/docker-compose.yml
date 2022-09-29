@@ -22,7 +22,7 @@
       context: ../src
       dockerfile: ./UNAHUR.MessageFun.Worker/Dockerfile
     volumes:
-      - ./worker.settings.json:/app/appsettings.json
+      - ./appsettings.json:/app/appsettings.Production.json
     environment:
       - MessageBusFun__RabbitMQ__Password=desarrollo
       - MessageBusFun__Metrics__Host=+
@@ -50,7 +50,7 @@
       context: ../src
       dockerfile: ./UNAHUR.MessageFun.Api/Dockerfile
     volumes:
-      - ./api.settings.json:/app/appsettings.json
+      - ./appsettings.json:/app/appsettings.Production.json
     environment:
       - MessageBusFun__RabbitMQ__Password=desarrollo
     ports:
