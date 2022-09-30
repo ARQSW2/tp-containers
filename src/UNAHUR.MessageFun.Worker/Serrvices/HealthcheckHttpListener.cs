@@ -67,20 +67,30 @@ namespace UNAHUR.MessageFun.Worker.Services
 
                 if (ctx == null) continue;
 
-
                 bool isHealthy = true;
-                if (ctx.Request.RawUrl.Contains("/healthz/live/"))
-                {
-                    var health = await _healthCheckService.CheckHealthAsync(registration => !registration.Tags.Contains("ready"), stoppingToken);
-                    isHealthy = health.Status == HealthStatus.Healthy;
-                }
-                else
-                {
-                    var health = await _healthCheckService.CheckHealthAsync(registration => registration.Tags.Contains("ready"), stoppingToken);
-                    isHealthy = health.Status == HealthStatus.Healthy;
-                }
-                var pstrResponse = isHealthy ? "Healthy" : "Unhealthy";
 
+                try
+                {
+                    
+                    if (ctx.Request.RawUrl.Contains("/healthz/live/"))
+                    {
+                        var health = await _healthCheckService.CheckHealthAsync(registration => !registration.Tags.Contains("live"), stoppingToken);
+                        isHealthy = health.Status == HealthStatus.Healthy;
+                    }
+                    else
+                    {
+                        var health = await _healthCheckService.CheckHealthAsync(registration => registration.Tags.Contains("ready"), stoppingToken);
+                        isHealthy = health.Status == HealthStatus.Healthy;
+                    }
+                    
+                }
+                catch (Exception ex)
+                {
+
+                    _logger.LogError(ex, "Error checking Health");
+                }
+
+                var pstrResponse = isHealthy ? "Healthy" : "Unhealthy";
                 var response = ctx.Response;
                 response.ContentType = "text/plain";
                 response.Headers.Add(HttpResponseHeader.CacheControl, "no-store, no-cache");
@@ -92,12 +102,6 @@ namespace UNAHUR.MessageFun.Worker.Services
                 response.OutputStream.Close();
                 response.Close();
             }
-        }
-
-        public override async Task StopAsync(CancellationToken cancellationToken)
-        {
-            _httpListener.Stop();
-            await base.StopAsync(cancellationToken);
         }
     }
 }
