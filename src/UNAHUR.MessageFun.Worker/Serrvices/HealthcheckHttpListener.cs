@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UNAHUR.MessageFun.Business;
 using static MassTransit.ValidationResultExtensions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace UNAHUR.MessageFun.Worker.Services
 {
@@ -39,10 +40,7 @@ namespace UNAHUR.MessageFun.Worker.Services
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
 
-            var healthBase = _configuration.Metrics.HealthPrefix;
-
-            if (!healthBase.EndsWith("/"))
-                healthBase += "/";
+            var healthBase = $"http://{_configuration.Metrics.Host}:{_configuration.Metrics.Port}/healthz/";
 
             _logger.LogInformation($"Healthcheck init on {healthBase}");
 
