@@ -13,8 +13,11 @@ using System.Threading.Tasks;
 using UNAHUR.MessageFun.Business;
 using static MassTransit.ValidationResultExtensions;
 
-namespace UNAHUR.MessageFun.Worker
+namespace UNAHUR.MessageFun.Worker.Services
 {
+    /// <summary>
+    /// Background service hosting Healthcheck's HttpListener
+    /// </summary>
     public class HealthcheckHttpListener : BackgroundService
     {
         private readonly ILogger<HealthcheckHttpListener> _logger;
@@ -27,7 +30,7 @@ namespace UNAHUR.MessageFun.Worker
         {
             _logger = logger;
             _healthCheckService = healthCheckService ?? throw new ArgumentNullException(nameof(healthCheckService));
-            _configuration = configuration.Value ?? throw new ArgumentNullException(nameof(healthCheckService));
+            _configuration = configuration.Value ?? throw new ArgumentNullException(nameof(configuration));
 
             _httpListener = new HttpListener();
         }
@@ -44,7 +47,7 @@ namespace UNAHUR.MessageFun.Worker
             _logger.LogInformation($"Healthcheck init on {healthBase}");
 
             _httpListener.Prefixes.Add(healthBase + "live/");
-            _httpListener.Prefixes.Add(healthBase+ "ready/");
+            _httpListener.Prefixes.Add(healthBase + "ready/");
 
             _httpListener.Start();
             _logger.LogInformation($"Healthcheck listening {healthBase}");
@@ -71,7 +74,8 @@ namespace UNAHUR.MessageFun.Worker
                     var health = await _healthCheckService.CheckHealthAsync(registration => !registration.Tags.Contains("ready"), stoppingToken);
                     isHealthy = health.Status == HealthStatus.Healthy;
                 }
-                else {
+                else
+                {
                     var health = await _healthCheckService.CheckHealthAsync(registration => registration.Tags.Contains("ready"), stoppingToken);
                     isHealthy = health.Status == HealthStatus.Healthy;
                 }
@@ -81,13 +85,19 @@ namespace UNAHUR.MessageFun.Worker
                 response.ContentType = "text/plain";
                 response.Headers.Add(HttpResponseHeader.CacheControl, "no-store, no-cache");
                 response.StatusCode = (int)HttpStatusCode.OK;
-                
+
                 var messageBytes = Encoding.UTF8.GetBytes(pstrResponse);
                 response.ContentLength64 = messageBytes.Length;
                 await response.OutputStream.WriteAsync(messageBytes, 0, messageBytes.Length);
                 response.OutputStream.Close();
                 response.Close();
             }
+        }
+
+        public override async Task StopAsync(CancellationToken cancellationToken)
+        {
+            _httpListener.Stop();
+            await base.StopAsync(cancellationToken);
         }
     }
 }

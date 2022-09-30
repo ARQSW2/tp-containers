@@ -11,7 +11,9 @@
     using UNAHUR.MessageFun.Business;
     using UNAHUR.MessageFun.Business.Messaging;
     using UNAHUR.MessageFun.Worker.Consumers;
- 
+    using UNAHUR.MessageFun.Worker.Serrvices;
+    using UNAHUR.MessageFun.Worker.Services;
+
     public class Program
     {
         static bool? _isRunningInContainer;
@@ -25,14 +27,6 @@
                 Serilog.Debugging.SelfLog.Enable(Console.Error);
                 Log.Information("Building host..");
                 var host = CreateHostBuilder(args).Build();
-
-                var config = host.Services.GetRequiredService<IOptions<MessageBusFunConfig>>().Value;
-
-                if (config.Metrics.Port > 0)
-                {
-                    var metricServer = new MetricServer(config.Metrics.Port);
-                    metricServer.Start();
-                }
 
                 Log.Information("Building host OK");
                 Log.Information("Running host host...");
@@ -187,6 +181,7 @@
                         };
                     }, tags: new[] { "ready" });
                 services.AddHostedService<HealthcheckHttpListener>();
+                services.AddHostedService<MetricsServerHost>();
 
             });
     }

@@ -58,8 +58,8 @@
         public int Port { get; set; }
         public MetricsConfig()
         {
-            HealthPrefix = "http://localhost:9091/healthz/";
-            this.Port = 0;
+            HealthPrefix = "http://localhost:9090/healthz/";
+            this.Port = 9090;
         }
 
     }

@@ -2,10 +2,6 @@
 
 FROM mcr.microsoft.com/dotnet/aspnet:6.0-alpine AS base
 WORKDIR /app
-# DEFAULT METRICS PORT
-ENV MessageBusFun__Metrics__Port 9090
-# DEFAULT HEALTH
-ENV MessageBusFun__Metrics__HealthPrefix http://+:9091/
 EXPOSE 9090
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
