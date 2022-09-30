@@ -33,10 +33,10 @@ namespace UNAHUR.MessageFun.Worker.Serrvices
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation($"Starting Metrics server on port {config.Metrics.Port}");
+            _logger.LogInformation($"Starting Metrics server on  {config.Metrics.Host}:{config.Metrics.Port}/metrics");
             try
             {
-                _metricServer = new MetricServer("localhost", config.Metrics.Port);
+                _metricServer = new MetricServer(config.Metrics.Host, config.Metrics.Port);
                 _metricServer.Start();
                 _logger.LogInformation($"Metrics server started");
             }
