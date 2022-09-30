@@ -179,7 +179,7 @@
                             // si se desconecta se reconecta solo
                             AutomaticRecoveryEnabled = true
                         };
-                    }, tags: new[] { "ready" });
+                    }, tags: new[] { "ready" }); 
                 services.AddHostedService<HealthcheckHttpListener>();
                 services.AddHostedService<MetricsServerHost>();
 
